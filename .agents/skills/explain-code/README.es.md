@@ -1,0 +1,147 @@
+> 🇬🇧 [English version](README.md)
+
+# explain-code
+
+Una [Agent Skill](https://code.claude.com/docs/en/skills) que obliga a un
+asistente de IA a explicar código como lo haría un buen ingeniero: con un modelo
+mental, un diagrama del mecanismo real, referencias exactas de línea, un
+escenario de falla concreto y una prueba que puedes correr para verificar que
+algo de todo eso es cierto.
+
+Sin dependencias. Sin scripts. Sin llamadas de red. Es un solo archivo Markdown
+que cambia lo que el asistente tiene permitido decir.
+
+## Por qué
+
+Le preguntas a un asistente "¿cómo funciona esto?" y la respuesta por defecto
+repite la sintaxis que ya tienes delante, y cierra con un "quizás quieras
+considerar posibles condiciones de carrera". Cada frase es verdadera y ninguna
+sirve para actuar.
+
+Esta skill reemplaza ese comportamiento por un contrato de cinco partes, y —lo
+que de verdad importa— le da a cada parte su **criterio de falla**:
+
+| Parte | Qué exige | Cómo falla |
+|---|---|---|
+| 1. Anclaje mental | Una analogía física, y *por qué* existe el patrón | Una analogía que nunca declara dónde se rompe |
+| 2. Arquitectura visual | Un diagrama Mermaid del mecanismo | Un recuadro por módulo: eso es un índice, no un diagrama |
+| 3. Flujo de datos | Entrada, transformaciones con `archivo.ts:L12-L24`, salida, efectos | Números de línea que nadie abrió |
+| 4. Modos de falla | Un escenario concreto, con entradas y el resultado equivocado | "Podría tener una condición de carrera": una categoría, no un hallazgo |
+| 5. Vector de verificación | Una prueba mínima que apunta a la falla de la parte 4 | Un test de camino feliz que pasa sobre código roto |
+
+La sección 0 es una precondición dura: **nunca expliques código que no leíste**,
+y nunca inventes una cita. Un solo número de línea fabricado le quita
+credibilidad a todos los demás.
+
+El asistente también tiene permiso explícito de **colapsar** las secciones que no
+tengan sustancia. Rellenar una sección vacía es el mismo fallo que un resumen
+genérico.
+
+## Instalación
+
+Claude Code, en un proyecto:
+
+```bash
+git clone https://github.com/Fedgutcor/explain-code-skill .claude/skills/explain-code
+```
+
+O globalmente, para todos tus proyectos:
+
+```bash
+git clone https://github.com/Fedgutcor/explain-code-skill ~/.claude/skills/explain-code
+```
+
+Las dos formas dejan un `.git/` dentro de la carpeta de la skill (~124 KB). Si
+prefieres tenerlo limpio, descarga los dos archivos sueltos — o clona en
+`~/projects` y symlinkea `~/.claude/skills/explain-code` hacia ahí, que es como
+la uso yo.
+
+Después basta con preguntar normal — `cómo funciona esto`, `explicame este
+código`, `walk me through this`. Los disparadores viven en el campo
+`description`, así que el asistente carga la skill solo. También puedes
+invocarla explícitamente con `/explain-code`.
+
+**Otros asistentes:** pega el cuerpo de [`SKILL.md`](SKILL.md) (todo lo que va
+debajo del bloque YAML) en tus instrucciones personalizadas. El contrato no
+depende de Claude Code.
+
+**Sobre el idioma:** el `SKILL.md` está en inglés a propósito, y es una sola
+versión. Mantener dos traducciones de un contrato es garantizar que diverjan —
+de hecho así empezó este repositorio: el artículo que lo regalaba publicaba una
+traducción que había perdido los disparadores del `description`, o sea una skill
+que no se activaba sola nunca. Los disparadores son bilingües, así que puedes
+preguntar en español sin perder nada.
+
+## Qué hay acá
+
+- [`SKILL.md`](SKILL.md) — el contrato. ~70 líneas.
+- [`examples.md`](examples.md) — una pasada completa sobre código real (una caché
+  con TTL que dispara una estampida de consultas), junto a la salida genérica que
+  el contrato prohíbe. El asistente lo carga bajo demanda, y vale la pena leerlo
+  tú también: la diferencia entre los dos no está en el largo, está en si el
+  lector puede hacer algo con lo que leyó.
+
+## Cómo funciona
+
+Acá viven dos mecanismos que no se tocan en tiempo de ejecución. El primero es
+el contrato que obedece el asistente; el segundo es el arnés que mide si
+obedecerlo cambia la respuesta. Derivado del código de este commit: los nodos
+nombran los archivos y funciones reales.
+
+```mermaid
+flowchart TB
+    subgraph runtime["Ejecución — dentro del asistente"]
+        Q["El usuario pregunta:<br/>'¿cómo funciona esto?'"] --> T{"¿coincide un trigger de<br/>description? (frontmatter de SKILL.md)"}
+        T -- sí --> S0["§0 Leer el código primero<br/>(solo Read / Grep / Glob)"]
+        S0 --> C["Contrato §1–§5<br/>anclaje · mermaid · flujo de datos<br/>modo de fallo · test de verificación"]
+        C -. bajo demanda .-> EX["examples.md<br/>una pasada completa sobre un caché TTL"]
+        C --> A["Respuesta con líneas exactas,<br/>un escenario de fallo concreto<br/>y un test ejecutable"]
+        T -- no --> D["Explicación por defecto"]
+    end
+
+    subgraph eval["Arnés de evaluación — tests/ (EXPLAIN_EVAL_ENABLED=1)"]
+        CS["cases.py<br/>BUGGY: defectos sembrados<br/>CONTROLS: código correcto"] --> EXP["harness.explain()<br/>system = contract() o BASELINE"]
+        EXP --> LLM["Endpoint compatible con OpenAI<br/>EXPLAIN_EVAL_BASE_URL / MODEL"]
+        LLM --> ANS["explicación"]
+        ANS --> G1["invents_defect()<br/>juez: CLEAN / INVENTED"]
+        ANS --> G2["detects_bug()<br/>juez: YES / NO"]
+        G1 --> T1["test_does_not_invent_defects<br/>(CONTROLS, con contrato)"]
+        G2 --> T2["test_still_finds_real_defects<br/>(BUGGY, con contrato)"]
+        G1 --> T3["test_baseline_is_clean_on_controls<br/>(CONTROLS, sin contrato:<br/>prueba la sonda, no la skill)"]
+    end
+
+    SK["SKILL.md"] --> T
+    SK -- "contract() quita el frontmatter" --> EXP
+```
+
+Dónde se rompe: el arnés califica con un modelo, así que un juez que sea el
+mismo modelo que explica es una verificación más débil (para eso existe
+`EXPLAIN_JUDGE_MODEL`), y un `test_baseline_is_clean_on_controls` en rojo
+significa que el culpable es el snippet de control, no el contrato.
+
+## ¿Funciona?
+
+Medido, incluyendo dónde perdió: [EVAL.md](EVAL.md). Resumen — sobre código con
+un defecto real, un juez ciego prefirió las explicaciones de este contrato 5 a 0
+para trabajo de reparación; sobre código **correcto** perdió 2 a 0 y, en un caso,
+inventó un defecto que no existía. Ese hallazgo cambió el contrato, y quedó
+congelado como test de regresión en [`tests/`](tests).
+
+## De dónde salió
+
+Escribí esta skill para mi propio trabajo y la regalé en un artículo sobre skills
+que vale la pena instalar: [Skills seguras para asistentes de
+IA](https://ultragresion.com/es/blog/skills-seguras-para-asistentes-de-ia/).
+
+El repositorio existe por un defecto de ese artículo. Publicaba la skill como un
+bloque para copiar y pegar, traducido al español — y la traducción había perdido
+en silencio los disparadores del campo `description`, que es exactamente el
+mecanismo que hace que una skill se active sola. El regalo no funcionaba como la
+copia que yo uso. Una sola fuente, en un solo lugar, es el arreglo.
+
+Contribuciones y forks: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licencia
+
+MIT. Úsala, bifúrcala, cambia el contrato para que se ajuste a cómo explica las
+cosas tu equipo.

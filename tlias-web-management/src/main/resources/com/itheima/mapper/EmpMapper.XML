@@ -1,0 +1,26 @@
+<!--定义Mapper映射文件的约束和基本结构，如果select的参数只有1个并且在1个类中，那么这里直接写属性名即可-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.EmpMapper">
+    <select id="list" resultType="com.itheima.pojo.Emp">
+        select e.*, d.name deptName
+        from emp as e
+                 left join dept as d on e.dept_id = d.id
+        <where>
+            <if test="empQueryParam.name != null and empQueryParam.name != ''">
+                and e.name like concat('%', #{empQueryParam.name}, '%')
+            </if>
+            <if test="empQueryParam.gender != null">
+                and e.gender = #{empQueryParam.gender}
+            </if>
+            <if test="empQueryParam.begin != null">
+                and e.entry_date &gt;= #{empQueryParam.begin}
+            </if>
+            <if test="empQueryParam.end != null">
+                and e.entry_date &lt;= #{empQueryParam.end}
+            </if>
+        </where>
+        limit #{start}, #{empQueryParam.pageSize}
+    </select>
+</mapper>

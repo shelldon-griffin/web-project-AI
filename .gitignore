@@ -1,0 +1,15 @@
+# 前端依赖和构建结果
+node_modules/
+dist/
+
+# Java 构建结果
+target/
+*.class
+
+# 本地环境变量
+.env
+.env.*
+!.env.example
+
+# 日志
+*.log

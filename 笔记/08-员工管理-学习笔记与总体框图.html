@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light"><meta name="description" content="飞书员工管理课程已读取部分的学习笔记，包含多表关系、多表查询、总体知识框图与三表关系图。"><title>员工管理 · 学习笔记与总体框图（已读部分）</title><style>
+:root{--ink:#24364c;--muted:#66778b;--blue:#1d4e89;--teal:#087f72;--border:#dfe6ee;--paper:#fff;--canvas:#f3f5f9;--mono:Consolas,"Cascadia Code","SFMono-Regular",monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}a:focus-visible{outline:3px solid #3e94c8;outline-offset:4px;border-radius:3px}
+.topbar{height:5px;background:linear-gradient(90deg,#1c4374 0%,#1c4374 65%,#178e86 100%)}.layout{display:grid;grid-template-columns:218px minmax(0,1000px);gap:34px;max-width:1332px;padding:42px 36px 64px;margin:auto}.sidebar{align-self:start;position:sticky;top:28px}.brand{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:2px;color:#254769}.nav-caption{font-size:11px;letter-spacing:2px;color:var(--muted);margin:30px 0 12px}.toc{display:grid;gap:4px}.toc a{display:flex;align-items:baseline;gap:12px;color:#53657a;padding:9px 12px;border-left:2px solid transparent;border-radius:0 5px 5px 0;font-size:13px}.toc a:hover{background:#e7edf6;border-color:var(--blue);color:var(--blue);text-decoration:none}.toc-num{font:11px var(--mono);color:#8092a7}.sidebar-note{margin:24px 12px 0;padding-top:18px;border-top:1px solid #d6e0eb;color:var(--muted);font-size:12px;line-height:1.8}.sidebar-note code{font-size:11px}.main{min-width:0}.hero{padding:38px 42px 32px;background:#183957;border-radius:14px;color:#fff;position:relative;overflow:hidden}.hero::before{content:"";position:absolute;top:0;left:0;width:5px;height:100%;background:#46b5a4}.eyebrow{font:11px var(--mono);letter-spacing:2.8px;color:#8fc9c5}.hero h1{font-size:clamp(26px,3.2vw,37px);line-height:1.4;letter-spacing:1px;margin:14px 0 12px}.hero-subtitle{color:#c1d2e2;font-size:14px;margin:0}.metadata{display:flex;flex-wrap:wrap;gap:9px 22px;color:#a9bed3;font-size:12px;margin-top:22px}.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}.pill{border:1px solid #42627d;border-radius:5px;padding:4px 11px;font:12px var(--mono);color:#deecf5}.hero-links{display:flex;gap:20px;margin-top:26px;font-size:13px}.hero-links a{color:#9cddd0}.reading-note{border:1px solid #cee1e5;border-left:3px solid #288e87;border-radius:7px;background:#edf7f6;padding:15px 20px;margin:22px 0 28px;color:#436265;font-size:13px}.reading-note strong{color:#176c62}
+.chapter{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:28px 32px;margin:0 0 22px;scroll-margin-top:24px}.chapter-heading{display:flex;align-items:center;gap:15px;padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid #e8edf3}.chapter-number{font:14px var(--mono);color:#6785a5;background:#edf3fa;border-radius:6px;padding:8px 10px}.chapter h2{font-size:21px;line-height:1.5;color:#1e3d5d;margin:0;letter-spacing:.4px}.chapter h3{font-size:17px;line-height:1.6;margin:30px 0 13px;color:#294e70}.chapter-content>h3:first-child{margin-top:0}p{margin:13px 0}strong{font-weight:650;color:#153d63}li{padding-left:3px;margin:6px 0}ul,ol{padding-left:25px;margin:15px 0}blockquote{margin:18px 0;padding:12px 18px;border-left:3px solid #7ba3c9;background:#f2f6fc;color:#536981}blockquote p{margin:0}
+code{font-family:var(--mono);font-size:.88em;padding:2px 5px;background:#f0f4f9;border-radius:4px;color:#215588;overflow-wrap:anywhere}pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;padding:20px 22px;overflow:auto;tab-size:4;margin:0;background:#152c43;color:#dce8f5}pre code{color:inherit;padding:0;background:none;border-radius:0;white-space:pre;overflow-wrap:normal;font-size:inherit}.code-block{margin:18px 0;border:1px solid #263e55;border-radius:8px;overflow:hidden}.code-label{background:#1f3a54;color:#a7bed1;padding:7px 20px;font:10px var(--mono);letter-spacing:1.6px}.table-scroll{max-width:100%;overflow-x:auto;margin:20px 0;border:1px solid var(--border);border-radius:7px}table{width:100%;border-collapse:collapse;text-align:left;font-size:13px;line-height:1.8}th{background:#eef3f9;color:#284b6b;font-weight:600;white-space:nowrap}td,th{padding:11px 14px;border-bottom:1px solid #e5ebf2;vertical-align:top}tbody tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafbfd}td code{white-space:normal}
+.diagram{margin:22px 0;background:#fbfcfe;border:1px solid var(--border);border-radius:9px;overflow:hidden}.diagram-scroll{overflow-x:auto;padding:16px 12px 0}.diagram svg{display:block;width:100%;min-width:640px;height:auto;font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.diagram.sequence svg{min-width:1150px}.diagram.startup svg{min-width:720px}.diagram figcaption{padding:12px 18px;border-top:1px solid #e5ebf2;color:#63768b;font-size:12px;background:#f5f8fc}.diagram-label{display:inline-block;margin-right:10px;font:10px var(--mono);letter-spacing:1px;color:#236c91}.page-footer{padding:10px 4px 0;display:flex;justify-content:space-between;gap:20px;font-size:12px;color:var(--muted)}.page-footer a{color:#527597}
+@media(min-width:1100px){.chapter:target{border-color:#a8c2dc;box-shadow:0 0 0 3px #dbe8f780}}@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr);gap:24px;padding:24px}.sidebar{position:static}.brand{display:inline-block}.nav-caption,.sidebar-note{display:none}.toc{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}.toc a{background:#e8eef6;border:0;border-radius:5px;padding:7px 10px;font-size:12px;gap:6px}.hero{padding:30px}.chapter{padding:24px}}@media(max-width:580px){body{font-size:14px}.layout{padding:18px 12px 36px;gap:18px}.toc a{font-size:11px;padding:5px 8px}.toc-num{display:none}.hero{padding:26px 22px}.hero h1{font-size:26px}.metadata{gap:6px 14px}.chapter{padding:20px 16px}.chapter h2{font-size:19px}.chapter h3{font-size:16px}.chapter-heading{gap:10px}.chapter-number{padding:6px 8px}.reading-note{padding:12px 15px}.diagram-scroll{padding:10px 4px 0}pre{padding:16px;font-size:11.5px}td,th{padding:9px 11px}table{min-width:460px}.page-footer{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@page{size:A4;margin:15mm}@media print{body{background:white;color:#111;font-size:10pt}.topbar,.sidebar,.hero-links,.page-footer a{display:none}.layout{display:block;padding:0;max-width:none}.hero{background:white;color:#183957;border:1px solid #b8c8d7;padding:20px;break-inside:avoid}.hero::before{display:none}.eyebrow,.metadata,.hero-subtitle{color:#53677c}.pill{color:#365572;border-color:#b4c5d7}.chapter{border:0;border-radius:0;padding:10px 0;margin:10px 0;box-shadow:none!important}.chapter-heading{break-after:avoid;padding-bottom:10px}.chapter h3{break-after:avoid}.chapter h2{font-size:17pt}.chapter-number{font-size:11pt}.reading-note{font-size:9pt}a{color:inherit;text-decoration:none}.table-scroll{overflow:visible}table{font-size:9pt;min-width:0}td,th{padding:7px 9px}tr{break-inside:avoid}.diagram{break-inside:avoid}.diagram-scroll{overflow:visible;padding:8px}.diagram svg,.diagram.sequence svg,.diagram.startup svg{min-width:0;width:100%;max-height:235mm}.diagram figcaption{font-size:8pt}pre{white-space:pre-wrap;overflow:visible;color:#1c3249;background:#f1f4f8;font-size:9pt}pre code{white-space:pre-wrap;word-break:break-word}.code-block{border-color:#cad5e1;break-inside:avoid}.code-label{background:#e5ecf4;color:#3f5b78}.page-footer{font-size:8pt}}
+
+.status-badge{display:inline-block;border:1px solid #d5c28c;border-radius:4px;background:#fff5dc;color:#785923;padding:3px 9px;font-size:11px;margin-bottom:15px;letter-spacing:.7px}.scope-note{background:#fff8eb;border-color:#ecd9ad;border-left-color:#ba893d;color:#6a5737}.scope-note strong{color:#855d20}.quiz{margin:12px 0;border:1px solid #dce6ee;border-radius:7px;padding:12px 16px;background:#f8fafc}.quiz summary{cursor:pointer;color:#294f75;font-weight:600}.quiz p{padding-top:9px;margin:6px 0 0}.hero-subtitle{max-width:650px}.diagram svg{min-width:800px}.scope-table td:last-child{font-weight:600}@media print{.quiz{break-inside:avoid}.quiz>p{display:block}.status-badge{color:#65522e}.diagram svg{min-width:0}}
+</style></head>
+<body id="top"><div class="topbar" aria-hidden="true"></div><div class="layout"><aside class="sidebar"><a class="brand" href="#top">TLIAS / STUDY</a><p class="nav-caption">学习笔记 / CONTENTS</p><nav class="toc" aria-label="笔记目录"><a href="#start"><span class="toc-num">01</span><span>学习主线</span></a><a href="#overview"><span class="toc-num">02</span><span>总体知识框图</span></a><a href="#relations"><span class="toc-num">03</span><span>三种多表关系</span></a><a href="#foreign-keys"><span class="toc-num">04</span><span>外键与数据一致性</span></a><a href="#queries"><span class="toc-num">05</span><span>多表查询的选择方法</span></a><a href="#sql"><span class="toc-num">06</span><span>SQL 速查：从需求选择写法</span></a><a href="#review"><span class="toc-num">07</span><span>易混点与自测</span></a><a href="#scope"><span class="toc-num">08</span><span>来源、阅读范围与待补内容</span></a></nav><p class="sidebar-note">08 · 后端 Web 实战<br>员工管理<br>2026 / 11 / 19<br><br>部分正文已读取<br>图形内嵌 · 离线可读<br>支持浏览器打印</p></aside>
+<main class="main"><header class="hero"><div class="status-badge">已读取部分 · 后续内容待补</div><br><span class="eyebrow">BACKEND WEB / LEARNING NOTES</span><h1>员工管理<br>学习笔记与总体框图</h1><p class="hero-subtitle">从“员工为什么要关联部门”，梳理表关系、外键和多表查询的选择方法。</p><div class="metadata"><span>原文：08-后端Web实战（员工管理）</span><span>读取日期：2026-11-19</span></div><div class="pills"><span class="pill">RELATIONSHIPS</span><span class="pill">FOREIGN KEY</span><span class="pill">JOIN</span><span class="pill">MYSQL</span></div><div class="hero-links"><a href="#overview">查看总体框图 ↓</a><a href="https://heuqqdmbyk.feishu.cn/wiki/XXQTwBpWLiFDzjkpXShcXt8lnYg" target="_blank" rel="noopener noreferrer">打开飞书原文 ↗</a><a href="#scope">查看阅读范围</a></div></header>
+<div class="reading-note scope-note"><strong>阅读范围：</strong>已读取多表关系、连接查询及子查询简介。后续分段要求登录，尚未取得子查询后续和员工列表查询正文。本页明确标记待补内容，不代表全文总结。</div>
+<section class="chapter" id="start" aria-labelledby="start-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">01</span><h2 id="start-heading">学习主线</h2></header><div class="chapter-content"><p>员工列表既要显示员工自身属性，也要显示<strong>所属部门名称</strong>。数据来自 <code>emp</code> 与 <code>dept</code> 两张表，因此本课从表关系和多表查询切入。</p>
+<p>把内容串起来，可以按三个问题复习：</p>
+<ol>
+<li><strong>数据怎么存？</strong> 识别实体之间的一对多、一对一、多对多关系，选择关联字段或中间表。</li>
+<li><strong>数据怎么查？</strong> 使用关联条件连接表，再根据“哪些记录必须保留”选择连接方式。</li>
+<li><strong>结果怎么用于页面？</strong> 进入员工列表查询业务。此部分的后续正文目前未取得，不能据此总结具体实现。</li>
+</ol>
+<blockquote>
+<p>本笔记整理的是该飞书文档已取得的内容。它是课程阅读笔记，不是对当前工作区代码实现状态的说明。</p>
+</blockquote></div></section><section class="chapter" id="overview" aria-labelledby="overview-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">02</span><h2 id="overview-heading">总体知识框图</h2></header><div class="chapter-content"><p>实线节点表示已经读取到的知识；灰色虚线节点表示课程提到了、但正文尚未读取到的后续内容。</p>
+<figure class="diagram"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 660" role="img" aria-labelledby="knowledge-title knowledge-desc"><title id="knowledge-title">员工管理课程总体知识框图</title><desc id="knowledge-desc">课程从员工列表需要展示部门名称出发，先学习多表关系，再学习多表查询，最后进入员工列表查询。员工列表查询及子查询后续正文尚未取得，以灰色虚线标示。</desc><defs><marker id="knowledge-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9 Z" fill="#52718c"/></marker></defs><rect width="1040" height="660" fill="#fbfcfe"/><rect x="230" y="25" width="580" height="80" rx="12" fill="#e9f7f3" stroke="#9dcebd" stroke-width="1.5"/><text x="520.0" y="58.0" font-size="19" fill="#0e6e60" text-anchor="middle" font-weight="600">业务起点：员工信息 + 所属部门</text><text x="520.0" y="84.0" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">单表不能提供全部展示数据，需要关联多张表</text><path d="M520 105 V145 H180 V185" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><path d="M520 105 V145 H520 V185" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><path d="M520 105 V145 H860 V185" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)" stroke-dasharray="6 5"/><rect x="30" y="185" width="300" height="76" rx="12" fill="#edf4ff" stroke="#afc8e8" stroke-width="1.5"/><text x="180.0" y="216.0" font-size="19" fill="#1b4b7c" text-anchor="middle" font-weight="600">01 · 关系建模</text><text x="180.0" y="242.0" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">先确定实体之间的关系</text><rect x="370" y="185" width="300" height="76" rx="12" fill="#edf4ff" stroke="#afc8e8" stroke-width="1.5"/><text x="520.0" y="216.0" font-size="19" fill="#1b4b7c" text-anchor="middle" font-weight="600">02 · 多表查询</text><text x="520.0" y="242.0" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">再确定要保留哪些记录</text><rect x="710" y="185" width="300" height="76" rx="12" fill="#f3f5f7" stroke="#b9c4cf" stroke-width="1.5" stroke-dasharray="6 5"/><text x="860.0" y="216.0" font-size="19" fill="#667386" text-anchor="middle" font-weight="600">03 · 员工列表查询</text><text x="860.0" y="242.0" font-size="16" fill="#667386" text-anchor="middle" font-weight="400">原文后续正文尚未读取</text><rect x="30" y="305" width="300" height="142" rx="12" fill="#ffffff" stroke="#ccd7e3" stroke-width="1.5"/><text x="180.0" y="343.0" font-size="19" fill="#334e68" text-anchor="middle" font-weight="600">三类关系</text><text x="180.0" y="369.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">一对多：关联字段放在多方</text><text x="180.0" y="395.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">一对一：关联字段增加唯一性</text><text x="180.0" y="421.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">多对多：通过中间表关联</text><rect x="370" y="305" width="300" height="142" rx="12" fill="#ffffff" stroke="#ccd7e3" stroke-width="1.5"/><text x="520.0" y="343.0" font-size="19" fill="#334e68" text-anchor="middle" font-weight="600">查询选择</text><text x="520.0" y="369.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">INNER JOIN：仅匹配成功</text><text x="520.0" y="395.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">LEFT / RIGHT JOIN：保留一侧</text><text x="520.0" y="421.0" font-size="16" fill="#334e68" text-anchor="middle" font-weight="400">子查询：已读到定义与用途</text><rect x="710" y="305" width="300" height="142" rx="12" fill="#f3f5f7" stroke="#b9c4cf" stroke-width="1.5" stroke-dasharray="6 5"/><text x="860.0" y="343.0" font-size="19" fill="#667386" text-anchor="middle" font-weight="600">待补齐原文后整理</text><text x="860.0" y="369.0" font-size="16" fill="#667386" text-anchor="middle" font-weight="400">接口需求与参数</text><text x="860.0" y="395.0" font-size="16" fill="#667386" text-anchor="middle" font-weight="400">查询实现与结果封装</text><text x="860.0" y="421.0" font-size="16" fill="#667386" text-anchor="middle" font-weight="400">不以通用知识代替未读原文</text><path d="M180 261 V305" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><path d="M520 261 V305" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><path d="M860 261 V305" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)" stroke-dasharray="6 5"/><rect x="30" y="490" width="300" height="104" rx="12" fill="#e9f7f3" stroke="#9dcebd" stroke-width="1.5"/><text x="180.0" y="522.0" font-size="19" fill="#0e6e60" text-anchor="middle" font-weight="600">数据模型落地</text><text x="180.0" y="548.0" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">dept → emp → emp_expr</text><text x="180.0" y="574.0" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">两组一对多；案例采用逻辑外键</text><rect x="370" y="490" width="300" height="104" rx="12" fill="#e9f7f3" stroke="#9dcebd" stroke-width="1.5"/><text x="520.0" y="522.0" font-size="19" fill="#0e6e60" text-anchor="middle" font-weight="600">员工 + 部门的关键关联</text><text x="520.0" y="548.0" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">e.dept_id = d.id</text><text x="520.0" y="574.0" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">要保留未分配部门的员工：左连接</text><path d="M180 447 V490" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><path d="M520 447 V490" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#knowledge-arrow)"/><text x="520" y="636" font-size="17" fill="#3f526a" text-anchor="middle" font-weight="400">已读主线：业务展示需求 → 数据关系 → 连接方式 → 查询结果</text></svg></div><figcaption><span class="diagram-label">FIG 01</span>已读内容与待补范围同时展示；虚线部分尚未取得正文。</figcaption></figure>
+
+<p><strong>快速记忆：先建关系，再选连接，最后服务业务展示。</strong></p></div></section><section class="chapter" id="relations" aria-labelledby="relations-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">03</span><h2 id="relations-heading">三种多表关系</h2></header><div class="chapter-content"><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>关系</th>
+<th>文中场景</th>
+<th>落地方法</th>
+<th>记忆重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一对多</td>
+<td>一个部门下有多名员工</td>
+<td>在“多”的一方保存关联字段，如 <code>emp.dept_id</code></td>
+<td>多方记录指向一方主键</td>
+</tr>
+<tr>
+<td>一对一</td>
+<td>用户基本信息与身份信息拆表</td>
+<td>关联字段指向另一表主键，并增加 <code>UNIQUE</code></td>
+<td>唯一约束限制关联重复</td>
+</tr>
+<tr>
+<td>多对多</td>
+<td>学生可以选择多门课程</td>
+<td>新建中间表，分别保存学生 ID、课程 ID</td>
+<td>一条中间表记录表示一次关联</td>
+</tr>
+</tbody>
+</table></div>
+<h3>员工管理案例：三张表、两组一对多</h3>
+<p>原文综合案例将部门、员工和工作经历拆成三张表。一个部门关联多个员工，一个员工可以填写多段工作经历。</p>
+<figure class="diagram"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 410" role="img" aria-labelledby="entities-title entities-desc"><title id="entities-title">员工管理三表关系框图</title><desc id="entities-desc">一个部门有多个员工，一个员工有多条工作经历。emp.dept_id 关联 dept.id，emp_expr.emp_id 关联 emp.id。原文综合案例没有声明物理外键。</desc><defs><marker id="entities-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9 Z" fill="#52718c"/></marker></defs><rect width="1040" height="410" fill="#fbfcfe"/><rect x="30" y="85" width="280" height="165" rx="12" fill="#edf4ff" stroke="#afc8e8" stroke-width="1.5"/><text x="170.0" y="134.5" font-size="19" fill="#1b4b7c" text-anchor="middle" font-weight="600">dept · 部门</text><text x="170.0" y="160.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">id：部门主键</text><text x="170.0" y="186.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">name：部门名称</text><text x="170.0" y="212.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">create_time / update_time</text><rect x="380" y="85" width="280" height="165" rx="12" fill="#e9f7f3" stroke="#9dcebd" stroke-width="1.5"/><text x="520.0" y="134.5" font-size="19" fill="#0e6e60" text-anchor="middle" font-weight="600">emp · 员工</text><text x="520.0" y="160.5" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">id：员工主键</text><text x="520.0" y="186.5" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">dept_id：关联部门</text><text x="520.0" y="212.5" font-size="16" fill="#0e6e60" text-anchor="middle" font-weight="400">姓名 / 性别 / 薪资 / 入职日期</text><rect x="730" y="85" width="280" height="165" rx="12" fill="#edf4ff" stroke="#afc8e8" stroke-width="1.5"/><text x="870.0" y="134.5" font-size="19" fill="#1b4b7c" text-anchor="middle" font-weight="600">emp_expr · 工作经历</text><text x="870.0" y="160.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">id：经历主键</text><text x="870.0" y="186.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">emp_id：关联员工</text><text x="870.0" y="212.5" font-size="16" fill="#1b4b7c" text-anchor="middle" font-weight="400">起止时间 / 公司 / 职位</text><path d="M310 167 H380" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#entities-arrow)"/><path d="M660 167 H730" stroke="#52718c" stroke-width="2" fill="none" marker-end="url(#entities-arrow)"/><text x="345" y="143" font-size="18" fill="#087f72" text-anchor="middle" font-weight="600">1 : N</text><text x="695" y="143" font-size="18" fill="#087f72" text-anchor="middle" font-weight="600">1 : N</text><text x="195" y="292" font-size="17" fill="#3f526a" text-anchor="middle" font-weight="400">dept.id</text><text x="520" y="292" font-size="17" fill="#3f526a" text-anchor="middle" font-weight="400">emp.dept_id  /  emp.id</text><text x="875" y="292" font-size="17" fill="#3f526a" text-anchor="middle" font-weight="400">emp_expr.emp_id</text><text x="520" y="352" font-size="17" fill="#3f526a" text-anchor="middle" font-weight="400">关联字段存储关系；本案例由应用逻辑维护关联一致性。</text></svg></div><figcaption><span class="diagram-label">FIG 02</span>原文综合案例的数据模型：部门 → 员工 → 工作经历。</figcaption></figure>
+
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>表</th>
+<th>作用</th>
+<th>主要字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dept</code></td>
+<td>保存部门</td>
+<td><code>id</code>、<code>name</code>、创建与修改时间</td>
+</tr>
+<tr>
+<td><code>emp</code></td>
+<td>保存员工信息</td>
+<td><code>id</code>、<code>name</code>、<code>gender</code>、<code>salary</code>、<code>entry_date</code>、<code>dept_id</code> 等</td>
+</tr>
+<tr>
+<td><code>emp_expr</code></td>
+<td>保存员工的多段工作经历</td>
+<td><code>id</code>、<code>emp_id</code>、起止日期、公司、职位</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>从约束可以进一步看出：</strong> <code>UNIQUE</code> 保证一个关联值最多出现一次，并不能单独保证每条主表记录都一定有扩展记录。理解一对一时，要区分“最多一条”和“必须存在一条”。这条是对约束含义的补充说明。</p></div></section><section class="chapter" id="foreign-keys" aria-labelledby="foreign-keys-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">04</span><h2 id="foreign-keys-heading">外键与数据一致性</h2></header><div class="chapter-content"><p>原文用“删除部门后，员工仍保留旧部门 ID”的场景说明：<strong>只有关联字段，不代表数据库会自动维护关联一致性。</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>谁负责约束</th>
+<th>本课需要掌握的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>物理外键</td>
+<td>数据库，通过 <code>FOREIGN KEY</code> 声明</td>
+<td>插入、修改、删除时由数据库检查关联约束</td>
+</tr>
+<tr>
+<td>逻辑外键</td>
+<td>应用的业务逻辑</td>
+<td>保存关联 ID，由业务代码检查和处理关联关系</td>
+</tr>
+</tbody>
+</table></div>
+<p>物理外键语法可概括为：</p>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>ALTER TABLE emp
+ADD CONSTRAINT fk_dept_id
+FOREIGN KEY (dept_id) REFERENCES dept(id);
+</code></pre></div>
+<p>增加约束前，需要先处理已有的无效关联。原文演示添加外键后，删除仍被员工引用的部门会受到约束阻止；这不代表所有外键都默认执行级联删除。</p>
+<p>原文最终的员工管理三表案例采用<strong>逻辑外键</strong>。复习时应记住两种方式的责任划分，不把本课的选型概括成所有项目都必须遵守的结论。</p></div></section><section class="chapter" id="queries" aria-labelledby="queries-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">05</span><h2 id="queries-heading">多表查询的选择方法</h2></header><div class="chapter-content"><h3>先给出关联条件</h3>
+<p>直接写 <code>FROM emp, dept</code> 会生成两表记录的组合。若两表分别有 <code>m</code>、<code>n</code> 行，在没有其他限制时，组合数量为 <code>m × n</code>。具体条数取决于当时的数据，应记住计算方法。</p>
+<p>员工与部门的主要关联条件是：</p>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>e.dept_id = d.id
+</code></pre></div>
+<h3>再判断哪些记录必须保留</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>查询方式</th>
+<th>保留规则</th>
+<th>放到员工场景中理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>INNER JOIN</code></td>
+<td>仅返回符合连接条件的组合</td>
+<td>员工没有匹配部门时不会出现在该查询结果中</td>
+</tr>
+<tr>
+<td><code>LEFT JOIN</code></td>
+<td>保留左表记录，右侧无匹配时补 <code>NULL</code></td>
+<td>以员工为左表，可保留未分配部门的员工</td>
+</tr>
+<tr>
+<td><code>RIGHT JOIN</code></td>
+<td>保留右表记录，左侧无匹配时补 <code>NULL</code></td>
+<td>以部门为右表，可保留没有员工的部门</td>
+</tr>
+</tbody>
+</table></div>
+<p>原文分别介绍隐式内连接（逗号加 <code>WHERE</code>）和显式内连接（<code>JOIN ... ON</code>）。左、右外连接可以通过交换两表的位置改写为等价形式。</p>
+<p>这里的“保留全部记录”指连接阶段；如果后面还有 <code>WHERE</code> 条件，仍要满足后续过滤条件。</p>
+<h3>子查询：当前只读到概念</h3>
+<p>一条 SQL 中嵌套另一条 <code>SELECT</code>，就是子查询。已取得的正文还说明：子查询可以出现在查询或数据修改语句中，外层最常见的是 <code>SELECT</code>。</p>
+<p><strong>子查询后续分类、示例以及员工列表实现尚未读取，本文不补写为原文内容。</strong></p></div></section><section class="chapter" id="sql" aria-labelledby="sql-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">06</span><h2 id="sql-heading">SQL 速查：从需求选择写法</h2></header><div class="chapter-content"><p>以下是根据原文场景重新整理的教学示例，增加了表别名和结果列别名；未连接数据库执行。</p>
+<h3>仅查询能匹配部门的员工</h3>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>SELECT e.id, e.name, d.name AS dept_name
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.id;
+</code></pre></div>
+<h3>保留全部员工，包括没有匹配部门的员工</h3>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>SELECT e.id, e.name, d.name AS dept_name
+FROM emp e
+LEFT JOIN dept d ON e.dept_id = d.id;
+</code></pre></div>
+<h3>保留全部部门，显示对应的员工</h3>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>SELECT d.name AS dept_name, e.name AS emp_name
+FROM emp e
+RIGHT JOIN dept d ON e.dept_id = d.id;
+</code></pre></div>
+<h3>查询工资高于 8000 的员工，并保留没有匹配部门者</h3>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>SELECT e.id, e.name, e.salary, d.name AS dept_name
+FROM emp e
+LEFT JOIN dept d ON e.dept_id = d.id
+WHERE e.salary &gt; 8000;
+</code></pre></div>
+<p>这里筛选的是员工自身的 <code>salary</code>，因此没有部门匹配的员工仍可在满足薪资条件时保留。如果还要求“男性”，可以增加 <code>AND e.gender = 1</code>；这是组合原文已有条件得到的写法。</p></div></section><section class="chapter" id="review" aria-labelledby="review-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">07</span><h2 id="review-heading">易混点与自测</h2></header><div class="chapter-content"><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>易混点</th>
+<th>应该怎样理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>保存 <code>dept_id</code> 就等于建立了物理外键？</td>
+<td>不等于；还要看是否声明了 <code>FOREIGN KEY</code> 约束</td>
+</tr>
+<tr>
+<td>一对一只加一个关联字段即可？</td>
+<td>还要限制其唯一性，否则同一主表记录可能被多条记录引用</td>
+</tr>
+<tr>
+<td>内连接会保留所有员工？</td>
+<td>仅保留符合关联条件的组合；缺少匹配部门者可能被排除</td>
+</tr>
+<tr>
+<td>左连接一定最终返回左表所有记录？</td>
+<td>连接会保留左表，后续 <code>WHERE</code> 仍可能筛掉记录</td>
+</tr>
+<tr>
+<td>员工名称和部门名称都叫 <code>name</code> 怎么区分？</td>
+<td>用 <code>e.name</code>、<code>d.name</code> 指定来源，并用结果列别名区分输出</td>
+</tr>
+<tr>
+<td>表取了别名之后怎样引用字段？</td>
+<td>在同一查询中使用该别名，例如 <code>e.dept_id</code></td>
+</tr>
+<tr>
+<td>员工管理是不是只需要员工表？</td>
+<td>本课综合案例还涉及部门表和工作经历表</td>
+</tr>
+</tbody>
+</table></div>
+<details class="quiz"><summary>自测 1：部门与员工是一对多，关联字段放在哪里？</summary><p>放在员工表中：<code>emp.dept_id</code> 关联 <code>dept.id</code>，即关联字段放在“多”的一方。</p></details>
+
+<details class="quiz"><summary>自测 2：要显示全部员工，未分配部门者也要显示，应选什么连接？</summary><p>以 <code>emp</code> 为左表使用 <code>LEFT JOIN dept</code>。没有部门匹配时，部门侧字段为 <code>NULL</code>。</p></details>
+
+<details class="quiz"><summary>自测 3：学生与课程多对多，怎样设计表？</summary><p>增加中间表，保存 <code>student_id</code> 与 <code>course_id</code>，分别关联学生表与课程表。</p></details>
+
+<p>建议复习顺序：<strong>画三类表关系 → 解释外键责任 → 区分三种连接 → 根据保留规则写 SQL → 取得剩余原文后补齐业务流程。</strong></p></div></section><section class="chapter" id="scope" aria-labelledby="scope-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">08</span><h2 id="scope-heading">来源、阅读范围与待补内容</h2></header><div class="chapter-content"><p>原文：<a href="https://heuqqdmbyk.feishu.cn/wiki/XXQTwBpWLiFDzjkpXShcXt8lnYg" target="_blank" rel="noopener noreferrer">《08-后端Web实战（员工管理）》· 飞书文档</a>。本次读取日期：<strong>2026-11-19</strong>。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>范围</th>
+<th>本次状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多表关系：一对多、一对一、多对多</td>
+<td>已读取并总结</td>
+</tr>
+<tr>
+<td>外键、一致性问题与员工管理三表设计</td>
+<td>已读取并总结</td>
+</tr>
+<tr>
+<td>多表查询概述、内连接和外连接</td>
+<td>已读取并总结</td>
+</tr>
+<tr>
+<td>子查询定义与用途简介</td>
+<td>已读取并总结</td>
+</tr>
+<tr>
+<td>子查询后续讲解</td>
+<td>尚未取得正文</td>
+</tr>
+<tr>
+<td>员工列表查询的具体需求与实现</td>
+<td>尚未取得正文</td>
+</tr>
+</tbody>
+</table></div>
+<p>公开页面返回了首批文档块，后续分段接口明确返回 <strong>Login Required</strong>。因此，这份文件是<strong>已读取部分的整理版，不是全文总结</strong>；图中的灰色虚线区域同样表示待补范围。</p>
+<p>取得包含后续内容的 Markdown、Word、PDF 导出文件，或完整正文后，可以继续补齐同一份 HTML。原文插图未逐张读取；本页两张图根据已取得的文字与 SQL 重新绘制，没有嵌入远程图片。</p>
+<p>本文以自己的语言归纳要点，省略课程推广、截图和大批初始化数据。SQL 为学习示例，未在项目数据库执行；未修改项目业务代码或依赖。</p></div></section><footer class="page-footer"><span>飞书课程阅读记录 · 2026-11-19 · 已读部分</span><a href="#top">返回顶部 ↑</a></footer></main></div></body></html>

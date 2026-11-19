@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="description" content="tlias-web-management 项目源码阅读笔记：项目结构、运行框图、启动流程、部门查询时序与本地运行方法。">
+<title>项目结构与运行笔记 | tlias-web-management</title>
+<style>
+:root{--ink:#24364c;--muted:#66778b;--blue:#1d4e89;--teal:#087f72;--border:#dfe6ee;--paper:#fff;--canvas:#f3f5f9;--mono:Consolas,"Cascadia Code","SFMono-Regular",monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}a:focus-visible{outline:3px solid #3e94c8;outline-offset:4px;border-radius:3px}
+.topbar{height:5px;background:linear-gradient(90deg,#1c4374 0%,#1c4374 65%,#178e86 100%)}.layout{display:grid;grid-template-columns:218px minmax(0,1000px);gap:34px;max-width:1332px;padding:42px 36px 64px;margin:auto}.sidebar{align-self:start;position:sticky;top:28px}.brand{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:2px;color:#254769}.nav-caption{font-size:11px;letter-spacing:2px;color:var(--muted);margin:30px 0 12px}.toc{display:grid;gap:4px}.toc a{display:flex;align-items:baseline;gap:12px;color:#53657a;padding:9px 12px;border-left:2px solid transparent;border-radius:0 5px 5px 0;font-size:13px}.toc a:hover{background:#e7edf6;border-color:var(--blue);color:var(--blue);text-decoration:none}.toc-num{font:11px var(--mono);color:#8092a7}.sidebar-note{margin:24px 12px 0;padding-top:18px;border-top:1px solid #d6e0eb;color:var(--muted);font-size:12px;line-height:1.8}.sidebar-note code{font-size:11px}.main{min-width:0}.hero{padding:38px 42px 32px;background:#183957;border-radius:14px;color:#fff;position:relative;overflow:hidden}.hero::before{content:"";position:absolute;top:0;left:0;width:5px;height:100%;background:#46b5a4}.eyebrow{font:11px var(--mono);letter-spacing:2.8px;color:#8fc9c5}.hero h1{font-size:clamp(26px,3.2vw,37px);line-height:1.4;letter-spacing:1px;margin:14px 0 12px}.hero-subtitle{color:#c1d2e2;font-size:14px;margin:0}.metadata{display:flex;flex-wrap:wrap;gap:9px 22px;color:#a9bed3;font-size:12px;margin-top:22px}.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}.pill{border:1px solid #42627d;border-radius:5px;padding:4px 11px;font:12px var(--mono);color:#deecf5}.hero-links{display:flex;gap:20px;margin-top:26px;font-size:13px}.hero-links a{color:#9cddd0}.reading-note{border:1px solid #cee1e5;border-left:3px solid #288e87;border-radius:7px;background:#edf7f6;padding:15px 20px;margin:22px 0 28px;color:#436265;font-size:13px}.reading-note strong{color:#176c62}
+.chapter{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:28px 32px;margin:0 0 22px;scroll-margin-top:24px}.chapter-heading{display:flex;align-items:center;gap:15px;padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid #e8edf3}.chapter-number{font:14px var(--mono);color:#6785a5;background:#edf3fa;border-radius:6px;padding:8px 10px}.chapter h2{font-size:21px;line-height:1.5;color:#1e3d5d;margin:0;letter-spacing:.4px}.chapter h3{font-size:17px;line-height:1.6;margin:30px 0 13px;color:#294e70}.chapter-content>h3:first-child{margin-top:0}p{margin:13px 0}strong{font-weight:650;color:#153d63}li{padding-left:3px;margin:6px 0}ul,ol{padding-left:25px;margin:15px 0}blockquote{margin:18px 0;padding:12px 18px;border-left:3px solid #7ba3c9;background:#f2f6fc;color:#536981}blockquote p{margin:0}
+code{font-family:var(--mono);font-size:.88em;padding:2px 5px;background:#f0f4f9;border-radius:4px;color:#215588;overflow-wrap:anywhere}pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;padding:20px 22px;overflow:auto;tab-size:4;margin:0;background:#152c43;color:#dce8f5}pre code{color:inherit;padding:0;background:none;border-radius:0;white-space:pre;overflow-wrap:normal;font-size:inherit}.code-block{margin:18px 0;border:1px solid #263e55;border-radius:8px;overflow:hidden}.code-label{background:#1f3a54;color:#a7bed1;padding:7px 20px;font:10px var(--mono);letter-spacing:1.6px}.table-scroll{max-width:100%;overflow-x:auto;margin:20px 0;border:1px solid var(--border);border-radius:7px}table{width:100%;border-collapse:collapse;text-align:left;font-size:13px;line-height:1.8}th{background:#eef3f9;color:#284b6b;font-weight:600;white-space:nowrap}td,th{padding:11px 14px;border-bottom:1px solid #e5ebf2;vertical-align:top}tbody tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafbfd}td code{white-space:normal}
+.diagram{margin:22px 0;background:#fbfcfe;border:1px solid var(--border);border-radius:9px;overflow:hidden}.diagram-scroll{overflow-x:auto;padding:16px 12px 0}.diagram svg{display:block;width:100%;min-width:640px;height:auto;font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}.diagram.sequence svg{min-width:1150px}.diagram.startup svg{min-width:720px}.diagram figcaption{padding:12px 18px;border-top:1px solid #e5ebf2;color:#63768b;font-size:12px;background:#f5f8fc}.diagram-label{display:inline-block;margin-right:10px;font:10px var(--mono);letter-spacing:1px;color:#236c91}.page-footer{padding:10px 4px 0;display:flex;justify-content:space-between;gap:20px;font-size:12px;color:var(--muted)}.page-footer a{color:#527597}
+@media(min-width:1100px){.chapter:target{border-color:#a8c2dc;box-shadow:0 0 0 3px #dbe8f780}}@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr);gap:24px;padding:24px}.sidebar{position:static}.brand{display:inline-block}.nav-caption,.sidebar-note{display:none}.toc{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}.toc a{background:#e8eef6;border:0;border-radius:5px;padding:7px 10px;font-size:12px;gap:6px}.hero{padding:30px}.chapter{padding:24px}}@media(max-width:580px){body{font-size:14px}.layout{padding:18px 12px 36px;gap:18px}.toc a{font-size:11px;padding:5px 8px}.toc-num{display:none}.hero{padding:26px 22px}.hero h1{font-size:26px}.metadata{gap:6px 14px}.chapter{padding:20px 16px}.chapter h2{font-size:19px}.chapter h3{font-size:16px}.chapter-heading{gap:10px}.chapter-number{padding:6px 8px}.reading-note{padding:12px 15px}.diagram-scroll{padding:10px 4px 0}pre{padding:16px;font-size:11.5px}td,th{padding:9px 11px}table{min-width:460px}.page-footer{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@page{size:A4;margin:15mm}@media print{body{background:white;color:#111;font-size:10pt}.topbar,.sidebar,.hero-links,.page-footer a{display:none}.layout{display:block;padding:0;max-width:none}.hero{background:white;color:#183957;border:1px solid #b8c8d7;padding:20px;break-inside:avoid}.hero::before{display:none}.eyebrow,.metadata,.hero-subtitle{color:#53677c}.pill{color:#365572;border-color:#b4c5d7}.chapter{border:0;border-radius:0;padding:10px 0;margin:10px 0;box-shadow:none!important}.chapter-heading{break-after:avoid;padding-bottom:10px}.chapter h3{break-after:avoid}.chapter h2{font-size:17pt}.chapter-number{font-size:11pt}.reading-note{font-size:9pt}a{color:inherit;text-decoration:none}.table-scroll{overflow:visible}table{font-size:9pt;min-width:0}td,th{padding:7px 9px}tr{break-inside:avoid}.diagram{break-inside:avoid}.diagram-scroll{overflow:visible;padding:8px}.diagram svg,.diagram.sequence svg,.diagram.startup svg{min-width:0;width:100%;max-height:235mm}.diagram figcaption{font-size:8pt}pre{white-space:pre-wrap;overflow:visible;color:#1c3249;background:#f1f4f8;font-size:9pt}pre code{white-space:pre-wrap;word-break:break-word}.code-block{border-color:#cad5e1;break-inside:avoid}.code-label{background:#e5ecf4;color:#3f5b78}.page-footer{font-size:8pt}}
+</style>
+</head>
+<body id="top">
+<div class="topbar" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar">
+<a class="brand" href="#top">TLIAS / NOTES</a>
+<p class="nav-caption">文档目录 / CONTENTS</p>
+<nav class="toc" aria-label="笔记章节导航"><a href="#overview"><span class="toc-num">01</span><span>项目概况</span></a><a href="#structure"><span class="toc-num">02</span><span>项目目录结构</span></a><a href="#runtime"><span class="toc-num">03</span><span>项目运行框图</span></a><a href="#source"><span class="toc-num">04</span><span>逐层阅读源码</span></a><a href="#api"><span class="toc-num">05</span><span>接口记录</span></a><a href="#notes"><span class="toc-num">06</span><span>当前实现中需要留意的两点</span></a><a href="#run"><span class="toc-num">07</span><span>配置与本地运行方法</span></a><a href="#study"><span class="toc-num">08</span><span>阅读顺序与学习记录</span></a><a href="#scope"><span class="toc-num">09</span><span>本次文档整理的核对范围</span></a></nav>
+<p class="sidebar-note">源码阅读记录<br><code>tlias-web-management</code><br>2026 / 11 / 18<br><br>三张运行图已内嵌，离线可读。<br>支持浏览器打印。</p>
+</aside>
+<main class="main">
+<header class="hero">
+<span class="eyebrow">SOURCE CODE READING / 2026.11.18</span>
+<h1>项目结构与运行笔记</h1>
+<p class="hero-subtitle">从 Spring Boot 启动入口，到一次部门查询的完整调用过程。</p>
+<div class="metadata"><span>项目：tlias-web-management</span><span>依据：业务源码、配置、构建与测试文件</span></div>
+<div class="pills"><span class="pill">JAVA 21</span><span class="pill">SPRING BOOT 4.0.9</span><span class="pill">MYBATIS</span><span class="pill">MYSQL</span><span class="pill">PORT 8081</span></div>
+<div class="hero-links"><a href="#runtime">查看运行框图 ↓</a><a href="项目结构与运行笔记.md">原始 Markdown ↗</a></div>
+</header>
+<div class="reading-note"><strong>阅读范围：</strong>记录当前代码已经实现的功能。运行框图依据源码与依赖配置绘制；未启动应用、连接数据库或实测接口。响应数据为示例。</div>
+<section class="chapter" id="overview" aria-labelledby="overview-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">01</span><h2 id="overview-heading">项目概况</h2></header><div class="chapter-content"><p>这是一个采用 <strong>Spring Boot + Spring MVC + MyBatis + MySQL</strong> 的 Java Web 后端项目，使用 Maven 构建，业务代码采用 Controller、Service、Mapper 三层结构。</p>
+<p>当前已经实现的业务是：<strong>查询全部部门，按更新时间倒序返回，并包装成统一的 JSON 结果。</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>项目项</th>
+<th>当前内容</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maven 坐标</td>
+<td><code>com.itheima:tlias-web-management:0.0.1-SNAPSHOT</code></td>
+<td><code>pom.xml</code></td>
+</tr>
+<tr>
+<td>Java 版本</td>
+<td>21</td>
+<td><code>pom.xml</code> 中的 <code>java.version</code></td>
+</tr>
+<tr>
+<td>Spring Boot 版本</td>
+<td>4.0.9</td>
+<td><code>pom.xml</code> 的父工程版本</td>
+</tr>
+<tr>
+<td>Web 组件</td>
+<td>Spring MVC、内嵌 Tomcat、JSON 消息转换</td>
+<td><code>spring-boot-starter-webmvc</code> 及其依赖</td>
+</tr>
+<tr>
+<td>MyBatis Starter 版本</td>
+<td>4.0.1</td>
+<td><code>pom.xml</code></td>
+</tr>
+<tr>
+<td>数据库驱动</td>
+<td>MySQL Connector/J，运行时依赖</td>
+<td><code>pom.xml</code></td>
+</tr>
+<tr>
+<td>辅助工具</td>
+<td>Lombok</td>
+<td><code>pom.xml</code> 与实体类注解</td>
+</tr>
+<tr>
+<td>应用名称</td>
+<td><code>tlias-web-management</code></td>
+<td><code>application.yaml</code></td>
+</tr>
+<tr>
+<td>HTTP 端口</td>
+<td><code>8081</code></td>
+<td><code>application.yaml</code></td>
+</tr>
+<tr>
+<td>数据库连接</td>
+<td><code>jdbc:mysql://localhost:3306/tlias</code></td>
+<td><code>application.yaml</code></td>
+</tr>
+<tr>
+<td>已有业务入口</td>
+<td><code>/depts</code></td>
+<td><code>DeptController</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>这里的版本是项目声明值，不代表对其他版本的兼容性结论。当前没有前端源码；<code>static</code>、<code>templates</code> 目录均为空。</p></div></section><section class="chapter" id="structure" aria-labelledby="structure-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">02</span><h2 id="structure-heading">项目目录结构</h2></header><div class="chapter-content"><div class="code-block"><div class="code-label">TEXT</div><pre><code>web-project-AI/
+├─ 笔记/
+│  ├─ 项目结构与运行笔记.md              # 原始 Markdown 笔记
+│  └─ 项目结构与运行笔记.html            # HTML 阅读版（本文）
+├─ web-project-AI.iml                   # IDEA 工程文件
+├─ .idea/                              # IDEA 配置，不属于业务执行链路
+└─ tlias-web-management/                # 实际 Maven / Spring Boot 工程
+   ├─ pom.xml                          # 依赖、Java 版本、构建插件
+   ├─ mvnw                             # Unix 类系统的 Maven Wrapper 脚本
+   ├─ mvnw.cmd                         # Windows 的 Maven Wrapper 脚本
+   ├─ .mvn/wrapper/
+   │  └─ maven-wrapper.properties       # Wrapper 与 Maven 分发配置
+   ├─ HELP.md                          # 工程生成时的参考文档
+   ├─ src/
+   │  ├─ main/
+   │  │  ├─ java/com/itheima/
+   │  │  │  ├─ TliasWebManagementApplication.java  # 启动入口
+   │  │  │  ├─ controller/
+   │  │  │  │  └─ DeptController.java             # 接收部门查询请求
+   │  │  │  ├─ service/
+   │  │  │  │  ├─ DeptService.java                # 部门业务接口
+   │  │  │  │  └─ impl/
+   │  │  │  │     └─ DeptServiceImpl.java         # 部门业务实现
+   │  │  │  ├─ mapper/
+   │  │  │  │  └─ DeptMapper.java                 # SQL 与结果映射入口
+   │  │  │  └─ pojo/
+   │  │  │     ├─ Dept.java                       # 部门数据对象
+   │  │  │     └─ Result.java                     # 统一响应对象
+   │  │  └─ resources/
+   │  │     ├─ application.yaml        # 数据源、MyBatis、端口配置
+   │  │     ├─ static/                 # 空目录
+   │  │     └─ templates/              # 空目录
+   │  └─ test/java/com/itheima/
+   │     └─ TliasWebManagementApplicationTests.java
+   └─ target/                          # 已存在的编译输出，不作为源码依据
+</code></pre></div>
+<p>下面提到的源码路径均以 <code>tlias-web-management/</code> 为基准。</p></div></section><section class="chapter" id="runtime" aria-labelledby="runtime-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">03</span><h2 id="runtime-heading">项目运行框图</h2></header><div class="chapter-content"><h3>3.1 整体结构与请求流向</h3>
+<figure class="diagram architecture"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 990" role="img" aria-labelledby="architecture-title architecture-desc">
+<title id="architecture-title">项目整体结构与请求流向</title>
+<desc id="architecture-desc">HTTP 请求从调用方进入 Tomcat、Spring MVC、Controller、Service、Mapper，通过 JDBC 查询 MySQL。结果逐层返回，在 Controller 包装为 Result 后转换成 JSON。虚线概括查询结果的逐层返回。</desc>
+<defs>
+<marker id="architecture-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#52718c"/></marker>
+<marker id="architecture-return" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#088477"/></marker>
+</defs>
+<rect width="1000" height="990" fill="#fbfcfe"/>
+<rect x="175" y="125" width="790" height="695" rx="18" fill="#f4f7fc" stroke="#c5d2e3" stroke-dasharray="6 5"/>
+<text x="195" y="151" text-anchor="start" font-size="16" fill="#3f526a" font-weight="600">Spring Boot 应用 · tlias-web-management · :8081</text>
+<rect x="240" y="25" width="390" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="435.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">调用方</text>
+<text x="435.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">浏览器 / curl / API 调试工具</text>
+<rect x="240" y="170" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="198.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">内嵌 Tomcat</text>
+<text x="435.0" y="224.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">接收 HTTP 请求</text>
+<rect x="240" y="280" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="308.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">Spring MVC / DispatcherServlet</text>
+<text x="435.0" y="334.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">匹配 /depts 请求路径</text>
+<rect x="240" y="390" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="418.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">DeptController.list()</text>
+<text x="435.0" y="444.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">调用业务服务并接收部门列表</text>
+<rect x="240" y="500" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="528.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">DeptServiceImpl.findAll()</text>
+<text x="435.0" y="554.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">实现 DeptService 接口</text>
+<rect x="240" y="610" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="638.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">DeptMapper.findAll()</text>
+<text x="435.0" y="664.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">MyBatis 创建代理，执行注解 SQL</text>
+<rect x="240" y="720" width="390" height="70" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="435.0" y="748.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">DataSource + JDBC</text>
+<text x="435.0" y="774.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">通过 MySQL 驱动访问数据库</text>
+<rect x="700" y="390" width="235" height="90" rx="12" fill="#eaf8f4" stroke="#a2d5c8" stroke-width="1.5"/>
+<text x="817.5" y="428.0" text-anchor="middle" font-size="19" fill="#08695f" font-weight="600">Result.success(...)</text>
+<text x="817.5" y="454.0" text-anchor="middle" font-size="16" fill="#08695f" font-weight="400">code / msg / data</text>
+<rect x="700" y="190" width="235" height="90" rx="12" fill="#eaf8f4" stroke="#a2d5c8" stroke-width="1.5"/>
+<text x="817.5" y="228.0" text-anchor="middle" font-size="19" fill="#08695f" font-weight="600">JSON 消息转换</text>
+<text x="817.5" y="254.0" text-anchor="middle" font-size="16" fill="#08695f" font-weight="400">Spring MVC 写入响应体</text>
+<rect x="240" y="885" width="390" height="76" rx="12" fill="#fff7e8" stroke="#e5c889" stroke-width="1.5"/>
+<text x="435.0" y="916.0" text-anchor="middle" font-size="19" fill="#7a531c" font-weight="600">MySQL · localhost:3306</text>
+<text x="435.0" y="942.0" text-anchor="middle" font-size="16" fill="#7a531c" font-weight="400">数据库 tlias / 表 dept</text>
+<path d="M435 105 V170" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<text x="450" y="128" text-anchor="start" font-size="16" fill="#3f526a" font-weight="400">GET /depts</text>
+<path d="M435 240 V280" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<path d="M435 350 V390" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<path d="M435 460 V500" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<path d="M435 570 V610" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<path d="M435 680 V720" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<path d="M435 790 V885" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#architecture-arrow)"/>
+<text x="450" y="853" text-anchor="start" font-size="16" fill="#3f526a" font-weight="400">SELECT · update_time DESC</text>
+<path d="M630 425 H700" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#architecture-return)"/>
+<path d="M817 390 V280" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#architecture-return)"/>
+<text x="828" y="339" text-anchor="start" font-size="15" fill="#088477" font-weight="400">返回对象</text>
+<path d="M817 190 V65 H630" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#architecture-return)"/>
+<text x="832" y="124" text-anchor="start" font-size="16" fill="#088477" font-weight="400">JSON 响应</text>
+<path d="M240 923 H75 V425 H240" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#architecture-return)"/>
+<text x="58" y="680" transform="rotate(-90 58 680)" text-anchor="middle" font-size="17" fill="#088477">查询结果经 JDBC / Mapper / Service 逐层返回</text>
+</svg></div><figcaption><span class="diagram-label">FIG 01</span>整体运行框图 · 虚线概括逐层返回及响应路径。</figcaption></figure>
+
+<p>图中的虚线概括数据返回过程，数据库结果实际经过 JDBC、Mapper、Service 后才到达 Controller，完整过程见第 3.3 节。</p>
+<p>下面的文本框图便于快速对照：</p>
+<div class="code-block"><div class="code-label">TEXT</div><pre><code>请求：调用方 → Tomcat → Spring MVC → DeptController
+     → DeptServiceImpl → DeptMapper 代理 → DataSource / JDBC → MySQL
+
+返回：MySQL → JDBC 查询结果 → MyBatis 映射为 List&lt;Dept&gt;
+     → DeptServiceImpl → DeptController → Result.success(...)
+     → JSON 消息转换 → 调用方
+</code></pre></div>
+<h3>3.2 应用启动流程</h3>
+<figure class="diagram startup"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-labelledby="startup-title startup-desc">
+<title id="startup-title">Spring Boot 应用启动流程</title>
+<desc id="startup-desc">main 方法引导 SpringApplication，读取配置并建立应用上下文，完成组件注册、数据库访问组件配置与 Web 服务初始化后应用就绪。此图为逻辑概括，不表示严格初始化顺序。</desc>
+<defs>
+<marker id="startup-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#52718c"/></marker>
+<marker id="startup-return" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#088477"/></marker>
+</defs>
+<rect width="1000" height="760" fill="#fbfcfe"/>
+<rect x="225" y="25" width="550" height="72" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="500.0" y="54.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">TliasWebManagementApplication.main()</text>
+<text x="500.0" y="80.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">运行 Java 启动入口</text>
+<rect x="225" y="135" width="550" height="72" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="500.0" y="164.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">SpringApplication.run(...)</text>
+<text x="500.0" y="190.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">引导 Spring Boot 启动</text>
+<rect x="225" y="245" width="550" height="72" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="500.0" y="274.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">加载 application.yaml</text>
+<text x="500.0" y="300.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">端口 / 数据源 / MyBatis 配置</text>
+<rect x="225" y="355" width="550" height="72" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="500.0" y="384.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">创建并刷新 Spring 应用上下文</text>
+<text x="500.0" y="410.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">组件扫描与自动配置</text>
+<path d="M500 97 V135" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M500 207 V245" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M500 317 V355" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<rect x="20" y="500" width="300" height="100" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="170.0" y="530.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">注册业务组件</text>
+<text x="170.0" y="556.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">Controller / Service</text>
+<text x="170.0" y="582.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">Mapper 代理与依赖注入</text>
+<rect x="350" y="500" width="300" height="100" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="500.0" y="530.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">配置数据访问组件</text>
+<text x="500.0" y="556.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">DataSource</text>
+<text x="500.0" y="582.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">MyBatis</text>
+<rect x="680" y="500" width="300" height="100" rx="12" fill="#eff5ff" stroke="#b9cfee" stroke-width="1.5"/>
+<text x="830.0" y="530.0" text-anchor="middle" font-size="19" fill="#173f70" font-weight="600">初始化 Web 服务</text>
+<text x="830.0" y="556.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">Spring MVC / Tomcat</text>
+<text x="830.0" y="582.0" text-anchor="middle" font-size="16" fill="#173f70" font-weight="400">监听端口 8081</text>
+<path d="M500 427 V460 H170 V500" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M500 427 V460 H500 V500" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M500 427 V460 H830 V500" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<rect x="225" y="675" width="550" height="64" rx="12" fill="#eaf8f4" stroke="#a2d5c8" stroke-width="1.5"/>
+<text x="500.0" y="713.0" text-anchor="middle" font-size="19" fill="#08695f" font-weight="600">应用就绪 · 接收 /depts 请求</text>
+<path d="M170 600 V638 H500 V675" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M500 600 V638 H500 V675" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+<path d="M830 600 V638 H500 V675" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#startup-arrow)"/>
+</svg></div><figcaption><span class="diagram-label">FIG 02</span>启动流程图 · 表示逻辑阶段，不代表内部组件的严格初始化顺序。</figcaption></figure>
+
+<p>这是启动阶段的逻辑概括，不表示内部组件严格按图中排列顺序逐一初始化。</p>
+<p>入口类位于 <code>com.itheima</code> 包，<code>@SpringBootApplication</code> 默认扫描其所在包及子包，因此当前的 Controller、Service 等都在扫描范围内。<code>@Mapper</code> 接口则由 MyBatis 的集成机制识别并注册代理。</p>
+<p>数据源组件完成配置不代表业务 SQL 已经执行。连接可能在使用时获取，应用能够启动也不能单独证明 <code>dept</code> 表存在或查询成功。</p>
+<h3>3.3 一次部门查询的时序图</h3>
+<figure class="diagram sequence"><div class="diagram-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 970" role="img" aria-labelledby="sequence-title sequence-desc">
+<title id="sequence-title">部门查询请求时序图</title>
+<desc id="sequence-desc">七个参与者分别是调用方、Web 框架、Controller、Service、Mapper、JDBC 和 MySQL。实线是调用，虚线是返回，时间从上向下推进。</desc>
+<defs>
+<marker id="sequence-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#52718c"/></marker>
+<marker id="sequence-return" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#088477"/></marker>
+</defs>
+<rect width="1480" height="970" fill="#fbfcfe"/>
+<line x1="110" y1="105" x2="110" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="14" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="110.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">调用方</text>
+<text x="110.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">浏览器 / 调试工具</text>
+<line x1="320" y1="105" x2="320" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="224" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="320.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">Tomcat / Spring MVC</text>
+<text x="320.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">请求路由与 JSON 转换</text>
+<line x1="530" y1="105" x2="530" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="434" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="530.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">DeptController</text>
+<text x="530.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">list()</text>
+<line x1="740" y1="105" x2="740" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="644" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="740.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">DeptServiceImpl</text>
+<text x="740.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">findAll()</text>
+<line x1="950" y1="105" x2="950" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="854" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="950.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">DeptMapper 代理</text>
+<text x="950.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">findAll()</text>
+<line x1="1160" y1="105" x2="1160" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="1064" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="1160.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">DataSource / JDBC</text>
+<text x="1160.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">数据库访问</text>
+<line x1="1370" y1="105" x2="1370" y2="935" stroke="#c5d2df" stroke-dasharray="5 6"/>
+<rect x="1274" y="25" width="192" height="80" rx="12" fill="#ffffff" stroke="#cfdae6" stroke-width="1.5"/>
+<text x="1370.0" y="58.0" text-anchor="middle" font-size="19" fill="#253c56" font-weight="600">MySQL</text>
+<text x="1370.0" y="84.0" text-anchor="middle" font-size="16" fill="#253c56" font-weight="400">tlias.dept</text>
+<rect x="315" y="150" width="10" height="745" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<rect x="525" y="205" width="10" height="630" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<rect x="735" y="260" width="10" height="435" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<rect x="945" y="315" width="10" height="320" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<rect x="1155" y="370" width="10" height="150" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<rect x="1365" y="425" width="10" height="50" rx="3" fill="#d8e6f6" stroke="#aac2dd"/>
+<path d="M110 150 H320" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="215.0" y="138" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">GET /depts</text>
+<path d="M320 205 H530" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="425.0" y="193" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">list()</text>
+<path d="M530 260 H740" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="635.0" y="248" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">findAll()</text>
+<path d="M740 315 H950" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="845.0" y="303" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">findAll()</text>
+<path d="M950 370 H1160" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="1055.0" y="358" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">执行注解 SELECT</text>
+<path d="M1160 425 H1370" fill="none" stroke="#52718c" stroke-width="2" marker-end="url(#sequence-arrow)"/>
+<text x="1265.0" y="413" text-anchor="middle" font-size="16" fill="#3f526a" font-weight="400">查询 dept，更新时间倒序</text>
+<path d="M1370 475 H1160" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="1265.0" y="463" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">查询结果</text>
+<path d="M1160 520 H950" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="1055.0" y="508" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">JDBC 结果集</text>
+<path d="M950 635 H740" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="845.0" y="623" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">List&lt;Dept&gt;</text>
+<path d="M740 695 H530" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="635.0" y="683" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">List&lt;Dept&gt;</text>
+<path d="M530 835 H320" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="425.0" y="823" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">Result 对象</text>
+<path d="M320 895 H110" fill="none" stroke="#088477" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#sequence-return)"/>
+<text x="215.0" y="883" text-anchor="middle" font-size="16" fill="#088477" font-weight="400">JSON 响应</text>
+<rect x="830" y="550" width="240" height="58" rx="12" fill="#eaf8f4" stroke="#a2d5c8" stroke-width="1.5"/>
+<text x="950.0" y="585.0" text-anchor="middle" font-size="19" fill="#08695f" font-weight="600">MyBatis：每行映射为 Dept</text>
+<rect x="405" y="740" width="250" height="58" rx="12" fill="#eaf8f4" stroke="#a2d5c8" stroke-width="1.5"/>
+<text x="530.0" y="775.0" text-anchor="middle" font-size="19" fill="#08695f" font-weight="600">Result.success(deptList)</text>
+<text x="30" y="955" text-anchor="start" font-size="15" fill="#3f526a" font-weight="400">实线：调用   /   虚线：返回   /   时间从上向下</text>
+</svg></div><figcaption><span class="diagram-label">FIG 03</span>部门查询时序图 · 时间从上向下；窄屏可横向滚动查看全部参与者。</figcaption></figure>
+
+<p>该时序图描述正常返回路径；数据库异常等情况会中断后续正常返回步骤。</p></div></section><section class="chapter" id="source" aria-labelledby="source-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">04</span><h2 id="source-heading">逐层阅读源码</h2></header><div class="chapter-content"><h3>4.1 启动入口</h3>
+<p>文件：<code>src/main/java/com/itheima/TliasWebManagementApplication.java</code></p>
+<div class="code-block"><div class="code-label">JAVA</div><pre><code>@SpringBootApplication
+public class TliasWebManagementApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TliasWebManagementApplication.class, args);
+    }
+}
+</code></pre></div>
+<p>这段代码负责引导应用启动。业务查询由启动后注册的 Controller、Service、Mapper 协作完成。</p>
+<h3>4.2 Controller：接收请求和封装响应</h3>
+<p>文件：<code>src/main/java/com/itheima/controller/DeptController.java</code></p>
+<ul>
+<li><code>@RestController</code>：将类注册为控制器，方法返回值交给消息转换器写入响应体。</li>
+<li><code>@Autowired private DeptService deptService</code>：注入部门业务服务，当前唯一实现是 <code>DeptServiceImpl</code>。</li>
+<li><code>@RequestMapping("/depts")</code>：将 <code>/depts</code> 路径映射到 <code>list()</code>，代码未限定 HTTP 方法；本文用 GET 演示调用。</li>
+<li><code>list()</code>：打印查询提示，调用 <code>deptService.findAll()</code>，再返回 <code>Result.success(deptList)</code>。</li>
+</ul>
+<p>Controller 没有直接编写 SQL，也没有分页、筛选或请求参数。</p>
+<h3>4.3 Service：定义业务能力并组织调用</h3>
+<p>文件：<code>src/main/java/com/itheima/service/DeptService.java</code><br>
+实现：<code>src/main/java/com/itheima/service/impl/DeptServiceImpl.java</code></p>
+<p>接口定义 <code>List&lt;Dept&gt; findAll()</code>；实现类使用 <code>@Service</code> 注册为 Spring Bean，并通过 <code>@Autowired</code> 注入 <code>DeptMapper</code>。</p>
+<p>当前业务实现只有一条转调语句：</p>
+<div class="code-block"><div class="code-label">JAVA</div><pre><code>return deptMapper.findAll();
+</code></pre></div>
+<p>因此目前 Service 没有额外的数据加工或业务判断。以后需要组合多个查询或增加业务规则时，可以在这一层扩展。</p>
+<h3>4.4 Mapper：执行 SQL 和映射数据</h3>
+<p>文件：<code>src/main/java/com/itheima/mapper/DeptMapper.java</code></p>
+<p><code>DeptMapper</code> 是带有 <code>@Mapper</code> 的接口。项目没有手写它的实现类，运行时由 MyBatis 提供代理。SQL 直接放在 <code>@Select</code> 注解中，当前没有 Mapper XML 文件。</p>
+<p>实际 SQL：</p>
+<div class="code-block"><div class="code-label">SQL</div><pre><code>select id, name, create_time, update_time
+from dept
+order by update_time desc;
+</code></pre></div>
+<p>这条 SQL 查询所有部门的四个字段，按更新时间倒序排列，没有 <code>WHERE</code> 过滤或分页限制。SQL 执行、结果映射均正常完成后，Mapper 返回 <code>List&lt;Dept&gt;</code>。</p>
+<h3>4.5 POJO：承载部门数据与响应结果</h3>
+<p>文件：<code>src/main/java/com/itheima/pojo/Dept.java</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Java 属性</th>
+<th>Java 类型</th>
+<th>SQL 中对应的列</th>
+<th>当前映射情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>Integer</code></td>
+<td><code>id</code></td>
+<td>名称一致</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>String</code></td>
+<td><code>name</code></td>
+<td>名称一致</td>
+</tr>
+<tr>
+<td><code>createTime</code></td>
+<td><code>LocalDateTime</code></td>
+<td><code>create_time</code></td>
+<td>命名不同，需要配置或显式映射</td>
+</tr>
+<tr>
+<td><code>updateTime</code></td>
+<td><code>LocalDateTime</code></td>
+<td><code>update_time</code></td>
+<td>命名不同，需要配置或显式映射</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>@Data</code> 提供 getter、setter 等方法，<code>@NoArgsConstructor</code> 与 <code>@AllArgsConstructor</code> 提供无参和全参构造方法。Lombok 在编译阶段生成这些代码，<code>pom.xml</code> 中配置了对应的注解处理器。</p>
+<p>项目没有提供建表 SQL，无法从仓库确认数据库列的实际类型、主键约束、索引或初始化数据；上表列名来自查询 SQL。</p>
+<p>文件：<code>src/main/java/com/itheima/pojo/Result.java</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>业务状态码：<code>1</code> 成功，<code>0</code> 失败</td>
+</tr>
+<tr>
+<td><code>msg</code></td>
+<td>提示文本；成功时为 <code>success</code></td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>实际业务数据，本接口为部门列表</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>Result.success()</code> 创建不带业务数据的成功结果，<code>Result.success(Object)</code> 创建带数据的成功结果，<code>Result.error(String)</code> 创建失败结果。当前 <code>/depts</code> 只调用带数据的成功方法。</p></div></section><section class="chapter" id="api" aria-labelledby="api-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">05</span><h2 id="api-heading">接口记录</h2></header><div class="chapter-content"><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问示例</td>
+<td><code>GET http://localhost:8081/depts</code></td>
+</tr>
+<tr>
+<td>请求参数</td>
+<td>无</td>
+</tr>
+<tr>
+<td>请求体</td>
+<td>无需提供</td>
+</tr>
+<tr>
+<td>处理方法</td>
+<td><code>DeptController.list()</code></td>
+</tr>
+<tr>
+<td>业务调用</td>
+<td><code>DeptService.findAll()</code> → <code>DeptMapper.findAll()</code></td>
+</tr>
+<tr>
+<td>返回数据</td>
+<td><code>Result</code> 包装的部门列表</td>
+</tr>
+<tr>
+<td>排序规则</td>
+<td><code>update_time DESC</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>下面是<strong>正常完成字段映射后的结构示例</strong>，其中数据和时间格式仅作说明，不是实测结果。当前代码的时间字段映射注意项见第 6 节。</p>
+<div class="code-block"><div class="code-label">JSON</div><pre><code>{
+  &quot;code&quot;: 1,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;教学部&quot;,
+      &quot;createTime&quot;: &quot;2026-11-18T09:00:00&quot;,
+      &quot;updateTime&quot;: &quot;2026-11-18T10:30:00&quot;
+    }
+  ]
+}
+</code></pre></div>
+<p>查询成功但没有部门记录时，<code>data</code> 为 <code>[]</code>，仍返回业务成功状态。<code>Result.code</code> 是响应体中的业务字段，不能等同于 HTTP 状态码。</p></div></section><section class="chapter" id="notes" aria-labelledby="notes-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">06</span><h2 id="notes-heading">当前实现中需要留意的两点</h2></header><div class="chapter-content"><h3>6.1 时间字段缺少下划线到驼峰的映射配置</h3>
+<p>SQL 返回 <code>create_time</code>、<code>update_time</code>，Java 对象使用 <code>createTime</code>、<code>updateTime</code>。当前 <code>application.yaml</code> 只有 MyBatis 日志配置，Mapper 中也没有使用 SQL 别名或 <code>@Results</code> 指定映射。</p>
+<p>本机缓存的 MyBatis 3.5.19 源码中，<code>mapUnderscoreToCamelCase</code> 默认值为 <code>false</code>。结合当前源码，在未受到额外外部配置覆盖的情况下，两个时间属性可能保持为 <code>null</code>。本次未运行数据库查询验证实际返回值。</p>
+<p>如果要完善映射，可以在现有配置块中补充：</p>
+<div class="code-block"><div class="code-label">YAML</div><pre><code>mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+</code></pre></div>
+<p>也可以使用 SQL 别名，例如 <code>create_time AS createTime</code>。这里仅记录可选处理方法，未修改项目配置或 SQL。</p>
+<h3>6.2 定义了失败结果，但没有统一异常处理</h3>
+<p>项目中存在 <code>Result.error(String)</code> 方法，但未发现全局异常处理器，Controller 也没有捕获数据库异常。数据库连接失败或 SQL 执行报错时，不会因为定义了这个方法就自动返回统一的 <code>Result</code> 失败结构。</p>
+<p>当前项目也未实现部门新增、修改、删除、分页、登录鉴权或其他业务模块。</p></div></section><section class="chapter" id="run" aria-labelledby="run-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">07</span><h2 id="run-heading">配置与本地运行方法</h2></header><div class="chapter-content"><h3>7.1 配置位置</h3>
+<p><code>src/main/resources/application.yaml</code> 包含：</p>
+<ul>
+<li><code>spring.application.name</code>：应用名称。</li>
+<li><code>spring.datasource</code>：MySQL 驱动、连接地址和账号密码；本文不复制配置中的密码。</li>
+<li><code>mybatis.configuration.log-impl</code>：使用 <code>StdOutImpl</code> 将 MyBatis 日志输出到控制台。</li>
+<li><code>server.port</code>：HTTP 端口 <code>8081</code>。</li>
+</ul>
+<p>当前连接目标是本机 MySQL 的 <code>tlias</code> 数据库。数据库需要存在 <code>dept</code> 表，且至少能够查询到 <code>id</code>、<code>name</code>、<code>create_time</code>、<code>update_time</code> 这些列。仓库内未提供数据库初始化脚本。</p>
+<h3>7.2 启动前提</h3>
+<ol>
+<li>准备 JDK 21；本次阅读环境中的 <code>java --version</code> 显示为 21.0.11。</li>
+<li>准备可连接的 MySQL，建立符合业务需要的数据库和表。</li>
+<li>将数据源配置调整为本机可用的连接信息。</li>
+<li>确认 <code>8081</code> 端口可用。</li>
+<li>准备 Maven 所需依赖；若首次使用 Wrapper 或缺少依赖，需要相应仓库可访问。</li>
+</ol>
+<p><code>maven-wrapper.properties</code> 声明的 Wrapper 版本是 <code>3.3.4</code>，Maven 分发版本是 <code>3.10.1</code>。这是文件中的配置值，本次未执行 Wrapper 下载或验证分发地址。</p>
+<h3>7.3 Windows PowerShell 启动</h3>
+<p>先进入实际 Maven 工程目录：</p>
+<div class="code-block"><div class="code-label">POWERSHELL</div><pre><code>Set-Location 'D:\agent_project\javaweb\web-project-AI\tlias-web-management'
+</code></pre></div>
+<p>使用项目自带的 Maven Wrapper 启动：</p>
+<div class="code-block"><div class="code-label">POWERSHELL</div><pre><code>.\mvnw.cmd spring-boot:run
+</code></pre></div>
+<p>也可以在 IDEA 中运行 <code>TliasWebManagementApplication.main()</code>。应用启动后，用下面的命令查询接口：</p>
+<div class="code-block"><div class="code-label">POWERSHELL</div><pre><code>Invoke-RestMethod -Method Get -Uri 'http://localhost:8081/depts' |
+    ConvertTo-Json -Depth 5
+</code></pre></div>
+<p>检查响应中的 <code>code</code>、<code>msg</code>、部门列表、排序以及两个时间字段，并结合控制台的 MyBatis 日志确认查询执行情况。</p>
+<h3>7.4 打包与测试命令</h3>
+<p>以下命令都应在 <code>tlias-web-management</code> 目录执行。</p>
+<div class="code-block"><div class="code-label">POWERSHELL</div><pre><code># 运行现有测试
+.\mvnw.cmd test
+
+# 执行打包，默认也会执行测试
+.\mvnw.cmd package
+
+# 打包成功后运行可执行 JAR
+java -jar .\target\tlias-web-management-0.0.1-SNAPSHOT.jar
+</code></pre></div>
+<p>现有 <code>TliasWebManagementApplicationTests</code> 只有一个带 <code>@SpringBootTest</code> 的空方法 <code>contextLoads()</code>，用于验证应用上下文能够加载。它没有调用 <code>/depts</code>、执行部门查询或断言时间字段，因此即使测试通过，也不能据此确认数据库查询和接口结果正确。</p>
+<p>以上为操作参考，本次未执行启动、打包和测试命令。</p></div></section><section class="chapter" id="study" aria-labelledby="study-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">08</span><h2 id="study-heading">阅读顺序与学习记录</h2></header><div class="chapter-content"><p>建议按下面的顺序再次阅读源码：</p>
+<ol>
+<li><strong><code>pom.xml</code></strong>：先确认 Java 版本、技术组件、依赖与构建方式。</li>
+<li><strong><code>application.yaml</code></strong>：找到端口、数据库地址与 MyBatis 配置。</li>
+<li><strong>启动类</strong>：理解 Spring 容器如何建立、组件扫描从哪里开始。</li>
+<li><strong><code>DeptController.list()</code></strong>：从 <code>/depts</code> 入口追踪实际调用。</li>
+<li><strong><code>DeptService</code> 与 <code>DeptServiceImpl</code></strong>：区分业务接口与实现类，观察依赖注入。</li>
+<li><strong><code>DeptMapper.findAll()</code></strong>：核对 SQL、排序及返回类型。</li>
+<li><strong><code>Dept</code> 与 <code>Result</code></strong>：分别理解数据库记录的承载方式和 HTTP 响应的数据结构。</li>
+<li><strong>测试类</strong>：明确已有测试覆盖到哪里，以及哪些结果仍需要接口验证。</li>
+</ol>
+<p>本项目中可以重点掌握这些概念：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>对应代码</th>
+<th>理解重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>分层设计</td>
+<td>Controller → Service → Mapper</td>
+<td>请求处理、业务组织、数据访问分别承担不同职责</td>
+</tr>
+<tr>
+<td>IoC / 依赖注入</td>
+<td><code>@Service</code>、<code>@Autowired</code></td>
+<td>对象由容器管理，使用方通过注入获得依赖</td>
+</tr>
+<tr>
+<td>面向接口编程</td>
+<td><code>DeptService</code>、<code>DeptServiceImpl</code></td>
+<td>Controller 依赖业务接口，当前注入具体实现</td>
+</tr>
+<tr>
+<td>MyBatis 代理</td>
+<td><code>@Mapper</code>、<code>@Select</code></td>
+<td>接口不需要手写实现类，代理负责执行 SQL 和映射结果</td>
+</tr>
+<tr>
+<td>数据映射</td>
+<td>SQL 列名与 <code>Dept</code> 属性</td>
+<td>数据能查询出来与属性能正确赋值需要分别核对</td>
+</tr>
+<tr>
+<td>统一响应</td>
+<td><code>Result.success(deptList)</code></td>
+<td>用固定的业务状态、提示和数据字段包装结果</td>
+</tr>
+<tr>
+<td>JSON 序列化</td>
+<td><code>@RestController</code> 与消息转换器</td>
+<td>Java 对象在写入 HTTP 响应时转换为 JSON</td>
+</tr>
+<tr>
+<td>Lombok</td>
+<td><code>@Data</code> 等注解及编译器配置</td>
+<td>编译期生成常用方法，减少手写样板代码</td>
+</tr>
+</tbody>
+</table></div></div></section><section class="chapter" id="scope" aria-labelledby="scope-heading"><header class="chapter-heading"><span class="chapter-number" aria-hidden="true">09</span><h2 id="scope-heading">本次文档整理的核对范围</h2></header><div class="chapter-content"><ul>
+<li>已阅读全部 7 个主程序 Java 文件、1 个测试 Java 文件及 <code>application.yaml</code>，并核对 <code>pom.xml</code>、Wrapper 配置和目录内容。</li>
+<li>已核对唯一业务路由 <code>/depts</code>、完整方法调用链、实际 SQL、实体属性和统一响应字段。</li>
+<li>已确认页面目录为空，未找到建表 SQL、Mapper XML 或前端 <code>package.json</code>。</li>
+<li>已整理 Markdown 与 HTML 文档，未修改 Java、JavaScript、数据库配置或依赖；未启动服务、连接数据库或运行测试。</li>
+</ul></div></section>
+<footer class="page-footer"><span>TLIAS · 项目源码阅读记录 · 2026-11-18</span><a href="#top">返回顶部 ↑</a></footer>
+</main>
+</div>
+</body>
+</html>
