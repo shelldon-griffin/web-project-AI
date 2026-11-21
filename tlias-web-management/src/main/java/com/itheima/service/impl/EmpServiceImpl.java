@@ -2,11 +2,9 @@ package com.itheima.service.impl;
 
 import com.itheima.mapper.EmpExprMapper;
 import com.itheima.mapper.EmpMapper;
-import com.itheima.pojo.Emp;
-import com.itheima.pojo.EmpExpr;
-import com.itheima.pojo.EmpQueryParam;
-import com.itheima.pojo.PageResult;
+import com.itheima.pojo.*;
 import com.itheima.service.EmpService;
+import com.itheima.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +13,9 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmpServiceImpl implements EmpService {
@@ -102,5 +102,22 @@ public class EmpServiceImpl implements EmpService {
         }
 
 
+    }
+
+    @Override
+    public LoginInfo login(Emp emp) {
+        //根据用户名和密码查询用户信息
+        Emp empLogin = empMapper.getUsernameAndPassword(emp);
+        if(empLogin != null){
+
+            //生成JWT令牌
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id",empLogin.getId());
+            claims.put("username",empLogin.getUsername());
+            String jwt = JwtUtils.generateJwt(claims);
+
+            return new LoginInfo(empLogin.getId(), empLogin.getUsername(), empLogin.getName(), jwt);
+        }
+        return null;
     }
 }
