@@ -8,12 +8,10 @@ import com.itheima.service.EmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 员工管理控制层
@@ -45,6 +43,59 @@ public class EmpController {
         return Result.success(pageResult);
 
     }
+
+    @PostMapping
+    public Result save(@RequestBody Emp emp){
+        log.info("请求参数emp: {}", emp);
+        empService.save(emp);
+        return Result.success();
+    }
+
+    /**
+     * 批量删除员工
+     * @param ids
+     * @return
+     */
+    @DeleteMapping  // @RequestParam 不可以省略(接受多个参数，使用集合来接收)
+    public Result delete(@RequestParam List<Integer> ids){
+        log.info("批量删除部门: ids={} ", ids);
+        empService.deleteByIds(ids);
+        return Result.success();
+    }
+
+    /**
+     * 修改员工
+     */
+    @GetMapping("/{id}")
+    public Result getInfo(@PathVariable Integer id){
+        log.info("修改员工信息: id={} ", id);
+        Emp emp = empService.getInfo(id);
+        return Result.success(emp);
+    }
+
+    @PutMapping
+    public Result update(@RequestBody Emp emp){
+        log.info("修改员工信息, {}", emp);
+        empService.update(emp);
+        return Result.success();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

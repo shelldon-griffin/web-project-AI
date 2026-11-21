@@ -7,6 +7,10 @@ spring:
     url: jdbc:mysql://localhost:3306/tlias
     username: root
     password: lql20040511
+  servlet:
+    multipart:
+      max-file-size: 10MB # 单个文件最大大小为10M
+      max-request-size: 100MB  # 最大请求大小（包括所有文件和表单数据最大为100MB）
 
 #mybatis配置
 mybatis:
@@ -15,6 +19,10 @@ mybatis:
     # 如果字段名与属性名符合驼峰命名规则，mybatis会自动通过驼峰命名规则映射。驼峰命名规则：abc_xyz => abcXyz
     map-underscore-to-camel-case: true
 
+#spring事务管理日志（只有JdbcTransactionManager类输出的debug日志我们可以看到）
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
 
 server:
   port: 8081
